@@ -10,35 +10,45 @@ const stripe = new Stripe(STRIPE_SK, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-serve(async (_req) => {
-  console.log("stripe", stripe.VERSION);
-
-  const account = await stripe.accounts.create({
-    email: "ji@test.com",
-    type: "express",
-    country: "FR",
-    capabilities: {
-      card_payments: { requested: true },
-      transfers: { requested: true },
-    },
+serve((req) => {
+  const data = req.body;
+  console.log("daata", data);
+  return new Response(JSON.stringify({ data }), {
+    headers: { "Content-Type": "application/json" },
   });
-
-  const accountLink = await stripe.accountLinks.create({
-    account: account.id,
-    refresh_url: `http://${DOMAIN_FRONT}`,
-    return_url: `http://${DOMAIN_FRONT}`,
-    type: "account_onboarding",
-  });
-
-  try {
-    return new Response(JSON.stringify({ message: "ok", accountLink }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.log("error", error.message);
-    return new Response(JSON.stringify(error.message), {
-      headers: { "Content-Type": "application/json" },
-      status: 404,
-    });
-  }
 });
+
+// serve(async (req) => {
+
+//   console.log(req.json())
+//   console.log("stripe", stripe.VERSION);
+
+//   const account = await stripe.accounts.create({
+//     email: "ji@test.com",
+//     type: "express",
+//     country: "FR",
+//     capabilities: {
+//       card_payments: { requested: true },
+//       transfers: { requested: true },
+//     },
+//   });
+
+//   const accountLink = await stripe.accountLinks.create({
+//     account: account.id,
+//     refresh_url: `http://${DOMAIN_FRONT}`,
+//     return_url: `http://${DOMAIN_FRONT}`,
+//     type: "account_onboarding",
+//   });
+
+//   try {
+//     return new Response(JSON.stringify({ message: "ok", accountLink }), {
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+//     console.log("error", error.message);
+//     return new Response(JSON.stringify(error.message), {
+//       headers: { "Content-Type": "application/json" },
+//       status: 404,
+//     });
+//   }
+// });
